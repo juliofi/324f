@@ -1,27 +1,95 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import { Login } from './pages/Login';
+import { Estoque } from './pages/Estoque';
+import { EstoqueFinal } from './pages/EstoqueFinal';
 import { Dashboard } from './pages/Dashboard';
 import { Insumos } from './pages/Insumos';
 import { Fornecedores } from './pages/Fornecedores';
-import { Contagem } from './pages/Contagem';
 import { Compras } from './pages/Compras';
-import { ListaCompras } from './pages/ListaCompras';
-import { Cotacao } from './pages/Cotacao';
+
+// Componente para proteger rotas
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+}
 
 function App() {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/insumos" element={<Insumos />} />
-          <Route path="/fornecedores" element={<Fornecedores />} />
-          <Route path="/contagem" element={<Contagem />} />
-          <Route path="/compras" element={<Compras />} />
-          <Route path="/lista-compras" element={<ListaCompras />} />
-          <Route path="/cotacao" element={<Cotacao />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route 
+          path="/" 
+          element={isAuthenticated ? <Navigate to="/estoque" replace /> : <Login />} 
+        />
+        <Route
+          path="/estoque"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Estoque />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insumos"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Insumos />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fornecedores"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Fornecedores />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/compras"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Compras />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/estoque-final"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <EstoqueFinal />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -47,6 +47,17 @@ export function Fornecedores() {
     setShowForm(false);
   };
 
+  const handleEnviarMensagem = (whatsapp: string) => {
+    // Remove caracteres não numéricos
+    const numero = whatsapp.replace(/\D/g, '');
+    if (numero) {
+      // Abre o WhatsApp Web/App com o número
+      window.open(`https://wa.me/${numero}`, '_blank');
+    } else {
+      alert('Número de WhatsApp inválido');
+    }
+  };
+
   return (
     <div className="fornecedores">
       <div className="page-header">
@@ -126,12 +137,20 @@ export function Fornecedores() {
                   <td>{fornecedor.vendedor}</td>
                   <td>{fornecedor.whatsapp}</td>
                   <td>
-                    <button onClick={() => handleEdit(fornecedor)} className="btn-edit">
-                      Editar
-                    </button>
-                    <button onClick={() => deleteFornecedor(fornecedor.id)} className="btn-delete">
-                      Excluir
-                    </button>
+                    <div className="actions-container">
+                      <button onClick={() => handleEdit(fornecedor)} className="btn-edit">
+                        Editar
+                      </button>
+                      <button onClick={() => deleteFornecedor(fornecedor.id)} className="btn-delete">
+                        Excluir
+                      </button>
+                      <button 
+                        onClick={() => handleEnviarMensagem(fornecedor.whatsapp)} 
+                        className="btn-message"
+                      >
+                        Enviar Mensagem
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

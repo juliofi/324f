@@ -24,6 +24,7 @@ export interface EstoqueInicial extends EstoqueItem {
 }
 
 export interface Compra extends EstoqueItem {
+  id?: string;
   semana: string;
   fornecedorId?: string;
 }
@@ -56,4 +57,14 @@ export interface Semana {
   compras: Compra[];
   estoqueFinal: EstoqueFinal[];
   cmv: CMV[];
+}
+
+export interface Mercadoria {
+  id: string;
+  nome: string;
+  descricao: string;
+  categoria: string;
+  quantidade: number;
+  precoUnitario: number;
+  unidadeMedida: string;
 }

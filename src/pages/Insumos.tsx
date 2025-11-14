@@ -4,7 +4,7 @@ import type { Insumo } from '../types';
 import './Insumos.css';
 
 export function Insumos() {
-  const { insumos, addInsumo, updateInsumo, deleteInsumo } = useApp();
+  const { itens, addItem, updateItem, deleteItem } = useApp();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -19,27 +19,27 @@ export function Insumos() {
     e.preventDefault();
     
     if (editingId) {
-      updateInsumo(editingId, formData);
+      updateItem(editingId, formData);
       setEditingId(null);
     } else {
-      const newInsumo: Insumo = {
+      const newItem: Insumo = {
         id: Date.now().toString(),
         ...formData,
       };
-      addInsumo(newInsumo);
+      addItem(newItem);
     }
     
     setFormData({ nome: '', categoria: '', unidadeMedida: 'kg' });
     setShowForm(false);
   };
 
-  const handleEdit = (insumo: Insumo) => {
+  const handleEdit = (item: Insumo) => {
     setFormData({
-      nome: insumo.nome,
-      categoria: insumo.categoria,
-      unidadeMedida: insumo.unidadeMedida,
+      nome: item.nome,
+      categoria: item.categoria,
+      unidadeMedida: item.unidadeMedida,
     });
-    setEditingId(insumo.id);
+    setEditingId(item.id);
     setShowForm(true);
   };
 
@@ -52,19 +52,19 @@ export function Insumos() {
   return (
     <div className="insumos">
       <div className="page-header">
-        <h1>Cadastro de Insumos</h1>
+        <h1>Cadastro de Itens</h1>
         <button onClick={() => setShowForm(true)} className="btn-primary">
-          + Novo Insumo
+          + Novo Item
         </button>
       </div>
 
       {showForm && (
         <div className="modal-overlay" onClick={handleCancel}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>{editingId ? 'Editar Insumo' : 'Novo Insumo'}</h2>
+            <h2>{editingId ? 'Editar Item' : 'Novo Item'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Nome do Insumo:</label>
+                <label>Nome do Item:</label>
                 <input
                   type="text"
                   value={formData.nome}
@@ -117,23 +117,23 @@ export function Insumos() {
             </tr>
           </thead>
           <tbody>
-            {insumos.length === 0 ? (
+            {itens.length === 0 ? (
               <tr>
                 <td colSpan={4} className="empty-state">
-                  Nenhum insumo cadastrado
+                  Nenhum item cadastrado
                 </td>
               </tr>
             ) : (
-              insumos.map(insumo => (
-                <tr key={insumo.id}>
-                  <td>{insumo.nome}</td>
-                  <td>{insumo.categoria}</td>
-                  <td>{insumo.unidadeMedida}</td>
+              itens.map(item => (
+                <tr key={item.id}>
+                  <td>{item.nome}</td>
+                  <td>{item.categoria}</td>
+                  <td>{item.unidadeMedida}</td>
                   <td>
-                    <button onClick={() => handleEdit(insumo)} className="btn-edit">
+                    <button onClick={() => handleEdit(item)} className="btn-edit">
                       Editar
                     </button>
-                    <button onClick={() => deleteInsumo(insumo.id)} className="btn-delete">
+                    <button onClick={() => deleteItem(item.id)} className="btn-delete">
                       Excluir
                     </button>
                   </td>

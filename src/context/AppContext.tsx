@@ -1,15 +1,17 @@
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { Insumo, Fornecedor, Semana } from '../types';
+import type { Insumo, Fornecedor, Semana, Mercadoria } from '../types';
+import { gerarSemanasIniciais } from '../utils/semanas';
 
 interface AppContextType {
-  insumos: Insumo[];
+  itens: Insumo[];
   fornecedores: Fornecedor[];
   semanas: Semana[];
   semanaAtual: string | null;
-  addInsumo: (insumo: Insumo) => void;
-  updateInsumo: (id: string, insumo: Partial<Insumo>) => void;
-  deleteInsumo: (id: string) => void;
+  mercadorias: Mercadoria[];
+  addItem: (item: Insumo) => void;
+  updateItem: (id: string, item: Partial<Insumo>) => void;
+  deleteItem: (id: string) => void;
   addFornecedor: (fornecedor: Fornecedor) => void;
   updateFornecedor: (id: string, fornecedor: Partial<Fornecedor>) => void;
   deleteFornecedor: (id: string) => void;
@@ -17,12 +19,15 @@ interface AppContextType {
   updateSemana: (id: string, semana: Partial<Semana>) => void;
   setSemanaAtual: (id: string | null) => void;
   getSemanaAtual: () => Semana | null;
+  addMercadoria: (mercadoria: Mercadoria) => void;
+  updateMercadoria: (id: string, mercadoria: Partial<Mercadoria>) => void;
+  deleteMercadoria: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [insumos, setInsumos] = useState<Insumo[]>(() => {
+  const [itens, setItens] = useState<Insumo[]>(() => {
     const saved = localStorage.getItem('insumos');
     return saved ? JSON.parse(saved) : [];
   });
@@ -33,18 +38,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
 
   const [semanas, setSemanas] = useState<Semana[]>(() => {
-    const saved = localStorage.getItem('semanas');
-    return saved ? JSON.parse(saved) : [];
+    // Sempre gerar as 10 semanas iniciais do zero
+    const semanasGeradas = gerarSemanasIniciais();
+    localStorage.setItem('semanas', JSON.stringify(semanasGeradas));
+    // Limpar semana atual antiga se existir
+    localStorage.removeItem('semanaAtual');
+    return semanasGeradas;
   });
 
   const [semanaAtual, setSemanaAtualState] = useState<string | null>(() => {
-    return localStorage.getItem('semanaAtual');
+    return null; // Sem semana selecionada por padrão
+  });
+
+  const [mercadorias, setMercadorias] = useState<Mercadoria[]>(() => {
+    const saved = localStorage.getItem('mercadorias');
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Salvar no localStorage sempre que houver mudanças
-  const saveInsumos = (newInsumos: Insumo[]) => {
-    setInsumos(newInsumos);
-    localStorage.setItem('insumos', JSON.stringify(newInsumos));
+  const saveItens = (newItens: Insumo[]) => {
+    setItens(newItens);
+    localStorage.setItem('insumos', JSON.stringify(newItens));
   };
 
   const saveFornecedores = (newFornecedores: Fornecedor[]) => {
@@ -57,16 +71,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('semanas', JSON.stringify(newSemanas));
   };
 
-  const addInsumo = (insumo: Insumo) => {
-    saveInsumos([...insumos, insumo]);
+  const saveMercadorias = (newMercadorias: Mercadoria[]) => {
+    setMercadorias(newMercadorias);
+    localStorage.setItem('mercadorias', JSON.stringify(newMercadorias));
   };
 
-  const updateInsumo = (id: string, updates: Partial<Insumo>) => {
-    saveInsumos(insumos.map(i => i.id === id ? { ...i, ...updates } : i));
+  const addItem = (item: Insumo) => {
+    saveItens([...itens, item]);
   };
 
-  const deleteInsumo = (id: string) => {
-    saveInsumos(insumos.filter(i => i.id !== id));
+  const updateItem = (id: string, updates: Partial<Insumo>) => {
+    saveItens(itens.map(i => i.id === id ? { ...i, ...updates } : i));
+  };
+
+  const deleteItem = (id: string) => {
+    saveItens(itens.filter(i => i.id !== id));
   };
 
   const addFornecedor = (fornecedor: Fornecedor) => {
@@ -103,16 +122,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return semanas.find(s => s.id === semanaAtual) || null;
   };
 
+  const addMercadoria = (mercadoria: Mercadoria) => {
+    saveMercadorias([...mercadorias, mercadoria]);
+  };
+
+  const updateMercadoria = (id: string, updates: Partial<Mercadoria>) => {
+    saveMercadorias(mercadorias.map(m => m.id === id ? { ...m, ...updates } : m));
+  };
+
+  const deleteMercadoria = (id: string) => {
+    saveMercadorias(mercadorias.filter(m => m.id !== id));
+  };
+
   return (
     <AppContext.Provider
       value={{
-        insumos,
+        itens,
         fornecedores,
         semanas,
         semanaAtual,
-        addInsumo,
-        updateInsumo,
-        deleteInsumo,
+        mercadorias,
+        addItem,
+        updateItem,
+        deleteItem,
         addFornecedor,
         updateFornecedor,
         deleteFornecedor,
@@ -120,6 +152,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         updateSemana,
         setSemanaAtual,
         getSemanaAtual,
+        addMercadoria,
+        updateMercadoria,
+        deleteMercadoria,
       }}
     >
       {children}

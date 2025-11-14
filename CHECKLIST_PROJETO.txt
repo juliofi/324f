@@ -1,0 +1,206 @@
+1. Estruturação Inicial e Ambiente de Desenvolvimento
+
+Criamos o projeto base em Vite + React + TypeScript com configuração otimizada para desenvolvimento moderno.
+Definimos estrutura organizada de diretórios: components, pages, context, types, assets e styles.
+Configuramos scripts de desenvolvimento (dev, build, lint, preview) no package.json.
+Integramos React Router DOM para gerenciamento de rotas e navegação.
+Configuramos ESLint com regras para React Hooks e TypeScript.
+✔️ Benefícios:
+Código limpo, escalável e pronto para produção.
+Ambiente de desenvolvimento rápido com hot reload.
+Estrutura organizada facilita manutenção e colaboração em equipe.
+TypeScript garante type safety e reduz erros em tempo de execução.
+
+2. Sistema de Rotas e Navegação
+
+Implementamos React Router DOM com rotas protegidas para todas as páginas da aplicação.
+Criamos componente ProtectedRoute para autenticação de rotas internas.
+Configuramos redirecionamento automático: usuários não autenticados vão para login, autenticados vão para dashboard.
+Definimos rotas principais: / (login), /dashboard, /insumos, /fornecedores, /contagem, /compras, /lista-compras, /cotacao.
+Implementamos navegação condicional baseada em estado de autenticação.
+✔️ Benefícios:
+Segurança: rotas protegidas impedem acesso não autorizado.
+Experiência do usuário fluida com redirecionamentos automáticos.
+Estrutura de rotas clara e fácil de expandir.
+Navegação intuitiva entre diferentes módulos da aplicação.
+
+3. Sistema de Autenticação e Login
+
+Criamos página de login completa com formulário de email e senha.
+Implementamos validação de campos obrigatórios com mensagens de erro.
+Desenvolvemos sistema de autenticação baseado em localStorage.
+Configuramos proteção de rotas que requerem autenticação.
+Adicionamos funcionalidade de logout no Layout com botão "Sair".
+Implementamos redirecionamento automático após login bem-sucedido.
+✔️ Benefícios:
+Segurança básica implementada para proteger rotas internas.
+Experiência de login simples e direta sem botão de registro.
+Estado de autenticação persistente entre sessões.
+Logout fácil e acessível em todas as páginas autenticadas.
+
+4. Context API e Gerenciamento de Estado Global
+
+Criamos AppContext para gerenciar estado global da aplicação (insumos, fornecedores, semanas).
+Implementamos hooks personalizados (useApp) para acesso fácil ao contexto.
+Desenvolvemos funções CRUD completas para insumos, fornecedores e semanas.
+Integramos persistência de dados com localStorage para manter dados entre sessões.
+Implementamos gerenciamento de semana atual com funções auxiliares.
+✔️ Benefícios:
+Estado global centralizado facilita compartilhamento de dados entre componentes.
+Persistência automática de dados no navegador.
+Código mais limpo sem prop drilling excessivo.
+Fácil adição de novas funcionalidades ao contexto.
+
+5. Páginas e Funcionalidades Principais
+
+Criamos página Dashboard com filtros de data, cálculo de CMV global, CMV percentual e valor em estoque.
+Desenvolvemos página Insumos com CRUD completo (criar, editar, excluir) e modal de formulário.
+Implementamos página Fornecedores para cadastro e gerenciamento de fornecedores.
+Criamos página Contagem para controle de estoque e contagens periódicas.
+Desenvolvemos página Compras para registro de compras realizadas.
+Implementamos página Lista de Compras para organização de itens a comprar.
+Criamos página Cotação para comparação de preços entre fornecedores.
+✔️ Benefícios:
+Sistema completo de gestão de estoque e compras.
+Interface intuitiva para cada funcionalidade específica.
+Modais e formulários reutilizáveis e consistentes.
+Tabelas responsivas para visualização de dados.
+
+6. Componente Layout e Sidebar
+
+Criamos componente Layout reutilizável que envolve todas as páginas autenticadas.
+Desenvolvemos sidebar fixa com navegação entre páginas principais.
+Implementamos sistema de highlight de rota ativa para feedback visual.
+Adicionamos logo e título "Controle de Estoque" no cabeçalho da sidebar.
+Criamos botão de logout posicionado no final da sidebar.
+Implementamos design responsivo com ajustes para mobile.
+✔️ Benefícios:
+Navegação consistente em todas as páginas.
+Interface profissional com sidebar fixa e bem organizada.
+Feedback visual claro sobre página atual.
+Logout acessível em qualquer momento.
+
+7. Design System e Estilização
+
+Definimos paleta de cores consistente: navy (#2c3e50), azul primário (#3498db), cinzas e vermelho para ações destrutivas.
+Criamos estilos globais em index.css com reset básico e variáveis CSS.
+Implementamos estilos modulares por componente (CSS separado para cada página).
+Desenvolvemos classes reutilizáveis para botões (primary, secondary, edit, delete, logout).
+Criamos cards, modais e formulários com design consistente e sombras sutis.
+Implementamos página de login com background navy mantendo padrão visual.
+✔️ Benefícios:
+Design consistente e profissional em toda aplicação.
+Fácil manutenção de estilos com arquivos separados por componente.
+Reutilização de classes CSS reduz duplicação de código.
+Identidade visual clara e coesa.
+
+8. TypeScript e Tipagem
+
+Criamos arquivo types/index.ts com definições de tipos para Insumo, Fornecedor e Semana.
+Definimos interfaces completas para todas as entidades do sistema.
+Implementamos tipagem forte em todos os componentes e funções.
+Configuramos TypeScript com strict mode para máxima segurança de tipos.
+Tipamos props de componentes, estados e funções do contexto.
+✔️ Benefícios:
+Type safety previne erros comuns em tempo de desenvolvimento.
+Autocomplete melhorado no IDE facilita desenvolvimento.
+Documentação implícita através de tipos.
+Refatoração mais segura com verificação de tipos.
+
+9. Persistência de Dados com LocalStorage
+
+Implementamos salvamento automático de insumos, fornecedores e semanas no localStorage.
+Criamos inicialização de estado a partir de dados salvos no localStorage.
+Desenvolvemos funções de salvamento que atualizam localStorage a cada mudança.
+Implementamos persistência de estado de autenticação e email do usuário.
+Criamos gerenciamento de semana atual com salvamento no localStorage.
+✔️ Benefícios:
+Dados persistem entre sessões do navegador.
+Experiência do usuário melhorada sem perda de dados.
+Implementação simples sem necessidade de backend inicial.
+Fácil migração futura para API real mantendo mesma estrutura.
+
+10. Configuração de Repositório Git e GitHub
+
+Configuramos repositório Git local com commits organizados.
+Renomeamos repositório remoto de 324b para 324f no GitHub.
+Atualizamos remote origin para apontar para repositório correto.
+Organizamos commits com mensagens descritivas seguindo boas práticas.
+Configuramos .gitignore completo para Node.js, Vite e arquivos de ambiente.
+✔️ Benefícios:
+Controle de versão adequado para colaboração.
+Histórico de mudanças claro e organizado.
+Repositório pronto para CI/CD e deploy automatizado.
+Facilita rollback e manutenção de código.
+
+11. Deploy no Vercel
+
+Configuramos projeto para deploy no Vercel com build otimizado.
+Ajustamos scripts de build (tsc -b && vite build) para produção.
+Configuramos variáveis de ambiente quando necessário.
+Otimizamos assets e código para produção com Vite.
+Testamos build local antes do deploy.
+✔️ Benefícios:
+Deploy rápido e automatizado a cada push.
+URL de produção acessível globalmente.
+Build otimizado para performance máxima.
+Integração contínua com GitHub para deploys automáticos.
+SSL automático e CDN global da Vercel.
+
+12. Formulários e Validação
+
+Implementamos formulários modais reutilizáveis para criação e edição de entidades.
+Criamos validação de campos obrigatórios em todos os formulários.
+Desenvolvemos feedback visual de erros com mensagens claras.
+Implementamos cancelamento de formulários com limpeza de estado.
+Criamos inputs com estilos consistentes e estados de focus.
+✔️ Benefícios:
+Experiência de usuário consistente em todos os formulários.
+Validação previne dados inválidos.
+Feedback claro ajuda usuário a corrigir erros.
+Código reutilizável reduz duplicação.
+
+13. Tabelas e Visualização de Dados
+
+Criamos tabelas responsivas para exibição de insumos, fornecedores e outras entidades.
+Implementamos estados vazios com mensagens informativas.
+Desenvolvemos hover effects para melhorar usabilidade.
+Criamos cabeçalhos de tabela com estilo destacado.
+Implementamos ações inline (editar, excluir) em cada linha.
+✔️ Benefícios:
+Visualização clara e organizada de dados.
+Interações intuitivas com hover e ações visíveis.
+Design profissional e limpo.
+Fácil identificação de dados importantes.
+
+14. Responsividade e Mobile-First
+
+Implementamos breakpoints para telas menores em todos os componentes.
+Ajustamos sidebar e conteúdo principal para mobile.
+Criamos formulários e modais responsivos.
+Otimizamos espaçamentos e tamanhos de fonte para diferentes telas.
+Testamos layout em diferentes resoluções.
+✔️ Benefícios:
+Aplicação acessível em qualquer dispositivo.
+Experiência consistente em desktop, tablet e mobile.
+Design adaptável melhora usabilidade geral.
+Alcance maior de usuários.
+
+15. Organização de Código e Boas Práticas
+
+Separamos componentes, páginas, contextos e tipos em diretórios específicos.
+Criamos arquivos CSS separados para cada componente/página.
+Implementamos nomes descritivos para funções e variáveis.
+Organizamos imports de forma lógica e agrupada.
+Seguimos convenções de nomenclatura consistentes.
+✔️ Benefícios:
+Código fácil de navegar e entender.
+Manutenção simplificada com estrutura clara.
+Onboarding rápido para novos desenvolvedores.
+Escalabilidade do projeto facilitada.
+
+
+
+
+
+

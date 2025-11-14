@@ -2,83 +2,85 @@
   max-width: 1200px;
 }
 
-.dashboard h1 {
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  margin: 0;
   color: #2c3e50;
-}
-
-.dashboard-filters {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filter-group label {
-  font-weight: 600;
+.semana-info-header {
   color: #555;
   font-size: 0.9rem;
+  font-weight: 400;
+  padding-left: 0.75rem;
 }
 
-.filter-group input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  min-width: 200px;
-}
-
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.card {
+.dashboard-content {
   background: white;
-  padding: 2rem;
   border-radius: 8px;
+  padding: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.semana-alert {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 1.5rem;
+  text-align: center;
+  color: #856404;
+}
+
+.semana-info {
+  padding: 1.5rem;
+}
+
+.semana-info h2 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.25rem;
+}
+
+.semana-info p {
+  margin: 0 0 2rem 0;
+  color: #555;
+  font-size: 1rem;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.stat-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
   border-left: 4px solid #3498db;
 }
 
-.card h3 {
-  margin: 0 0 1rem 0;
+.stat-card h3 {
+  margin: 0 0 0.5rem 0;
   color: #555;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-.card .value {
+.stat-value {
+  margin: 0;
+  color: #2c3e50;
   font-size: 2rem;
   font-weight: 700;
-  color: #2c3e50;
-  margin: 0;
-}
-
-.dashboard-info {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dashboard-info p {
-  margin: 0.5rem 0;
-  color: #555;
-  font-size: 1rem;
-}
-
-.dashboard-info strong {
-  color: #2c3e50;
 }
 

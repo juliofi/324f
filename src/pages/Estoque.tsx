@@ -1,19 +1,18 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import type { Compra } from '../types';
+import type { EstoqueInicial } from '../types';
 import { formatarPeriodoSemana } from '../utils/semanas';
-import './Compras.css';
+import './Estoque.css';
 
-export function Compras() {
-  const { itens, fornecedores, semanaAtual, semanas, updateSemana } = useApp();
+export function Estoque() {
+  const { itens, semanaAtual, semanas, updateSemana } = useApp();
   const semana = semanas.find(s => s.id === semanaAtual);
-  const compras = semana?.compras || [];
+  const estoqueInicial = semana?.estoqueInicial || [];
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     insumoId: '',
-    fornecedorId: '',
     quantidade: 0,
     precoUnitario: 0,
   });
@@ -22,30 +21,27 @@ export function Compras() {
     e.preventDefault();
     
     if (!semana) {
-      alert('Selecione uma semana no Dashboard primeiro!');
+      alert('Selecione uma semana na sidebar primeiro!');
       return;
     }
 
     const precoTotal = formData.quantidade * formData.precoUnitario;
-    const novaCompra: Compra = {
-      id: editingId || Date.now().toString(),
+    const novoItem: EstoqueInicial = {
       insumoId: formData.insumoId,
       quantidade: formData.quantidade,
       precoUnitario: formData.precoUnitario,
       precoTotal: precoTotal,
       semana: semana.id,
-      fornecedorId: formData.fornecedorId || undefined,
     };
 
-    const novasCompras = editingId
-      ? compras.map(c => (c.id || c.insumoId) === editingId ? novaCompra : c)
-      : [...compras, novaCompra];
+    const novosItens = editingId
+      ? estoqueInicial.map(item => item.insumoId === editingId ? novoItem : item)
+      : [...estoqueInicial, novoItem];
 
-    updateSemana(semana.id, { compras: novasCompras });
+    updateSemana(semana.id, { estoqueInicial: novosItens });
     
     setFormData({ 
       insumoId: '', 
-      fornecedorId: '', 
       quantidade: 0, 
       precoUnitario: 0 
     });
@@ -53,30 +49,28 @@ export function Compras() {
     setShowForm(false);
   };
 
-  const handleEdit = (compra: Compra) => {
+  const handleEdit = (item: EstoqueInicial) => {
     setFormData({
-      insumoId: compra.insumoId,
-      fornecedorId: compra.fornecedorId || '',
-      quantidade: compra.quantidade,
-      precoUnitario: compra.precoUnitario,
+      insumoId: item.insumoId,
+      quantidade: item.quantidade,
+      precoUnitario: item.precoUnitario,
     });
-    setEditingId(compra.id || compra.insumoId);
+    setEditingId(item.insumoId);
     setShowForm(true);
   };
 
-  const handleDelete = (compraId: string) => {
+  const handleDelete = (insumoId: string) => {
     if (!semana) return;
     
-    if (window.confirm('Tem certeza que deseja excluir esta compra?')) {
-      const novasCompras = compras.filter(c => (c.id || c.insumoId) !== compraId);
-      updateSemana(semana.id, { compras: novasCompras });
+    if (window.confirm('Tem certeza que deseja excluir este item?')) {
+      const novosItens = estoqueInicial.filter(item => item.insumoId !== insumoId);
+      updateSemana(semana.id, { estoqueInicial: novosItens });
     }
   };
 
   const handleCancel = () => {
     setFormData({ 
       insumoId: '', 
-      fornecedorId: '', 
       quantidade: 0, 
       precoUnitario: 0 
     });
@@ -96,40 +90,44 @@ export function Compras() {
     return item ? `${item.nome} (${item.unidadeMedida})` : 'Item não encontrado';
   };
 
-  const getFornecedorNome = (fornecedorId?: string) => {
-    if (!fornecedorId) return '-';
-    const fornecedor = fornecedores.find(f => f.id === fornecedorId);
-    return fornecedor ? fornecedor.empresa : 'Fornecedor não encontrado';
+  const getItemCategoria = (itemId: string) => {
+    const item = itens.find(i => i.id === itemId);
+    return item ? item.categoria : '-';
+  };
+
+  const getItemUnidade = (itemId: string) => {
+    const item = itens.find(i => i.id === itemId);
+    return item ? item.unidadeMedida : '-';
   };
 
   if (!semana) {
     return (
-      <div className="compras">
+      <div className="estoque">
         <div className="page-header">
-          <h1>Compras</h1>
+          <h1>Estoque Inicial</h1>
         </div>
         <div className="semana-alert">
-          <p>Selecione uma semana no Dashboard para visualizar e gerenciar as compras.</p>
+          <p>Selecione uma semana na sidebar para visualizar e gerenciar o estoque inicial.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="compras">
+    <div className="estoque">
       <div className="page-header">
         <h1>
-          Compras <span className="semana-info-header">({formatarPeriodoSemana(semana)})</span>
+          Estoque Inicial <span className="semana-info-header">({formatarPeriodoSemana(semana)})</span>
         </h1>
         <button onClick={() => setShowForm(true)} className="btn-primary">
-          + Nova Compra
+          + Novo Item
         </button>
       </div>
 
       {showForm && (
         <div className="modal-overlay" onClick={handleCancel}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>{editingId ? 'Editar Compra' : 'Nova Compra'}</h2>
+            <h2>{editingId ? 'Editar Item' : 'Novo Item'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>Item:</label>
@@ -142,20 +140,6 @@ export function Compras() {
                   {itens.map(item => (
                     <option key={item.id} value={item.id}>
                       {item.nome} ({item.unidadeMedida})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Fornecedor:</label>
-                <select
-                  value={formData.fornecedorId}
-                  onChange={(e) => setFormData({ ...formData, fornecedorId: e.target.value })}
-                >
-                  <option value="">Selecione um fornecedor (opcional)</option>
-                  {fornecedores.map(fornecedor => (
-                    <option key={fornecedor.id} value={fornecedor.id}>
-                      {fornecedor.empresa}
                     </option>
                   ))}
                 </select>
@@ -202,33 +186,33 @@ export function Compras() {
           <thead>
             <tr>
               <th>Item</th>
-              <th>Fornecedor</th>
+              <th>Categoria</th>
               <th>Quantidade</th>
               <th>Preço Unitário</th>
-              <th>Preço Total</th>
+              <th>Valor Total</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {compras.length === 0 ? (
+            {estoqueInicial.length === 0 ? (
               <tr>
                 <td colSpan={6} className="empty-state">
-                  Nenhuma compra cadastrada para esta semana
+                  Nenhum item cadastrado para esta semana
                 </td>
               </tr>
             ) : (
-              compras.map(compra => (
-                <tr key={compra.id || compra.insumoId}>
-                  <td>{getItemNome(compra.insumoId)}</td>
-                  <td>{getFornecedorNome(compra.fornecedorId)}</td>
-                  <td>{compra.quantidade}</td>
-                  <td>{formatCurrency(compra.precoUnitario)}</td>
-                  <td>{formatCurrency(compra.precoTotal)}</td>
+              estoqueInicial.map(item => (
+                <tr key={item.insumoId}>
+                  <td>{getItemNome(item.insumoId)}</td>
+                  <td>{getItemCategoria(item.insumoId)}</td>
+                  <td>{item.quantidade} {getItemUnidade(item.insumoId)}</td>
+                  <td>{formatCurrency(item.precoUnitario)}</td>
+                  <td>{formatCurrency(item.precoTotal)}</td>
                   <td>
-                    <button onClick={() => handleEdit(compra)} className="btn-edit">
+                    <button onClick={() => handleEdit(item)} className="btn-edit">
                       Editar
                     </button>
-                    <button onClick={() => handleDelete(compra.id || compra.insumoId)} className="btn-delete">
+                    <button onClick={() => handleDelete(item.insumoId)} className="btn-delete">
                       Excluir
                     </button>
                   </td>
