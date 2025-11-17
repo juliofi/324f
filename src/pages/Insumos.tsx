@@ -7,6 +7,8 @@ export function Insumos() {
   const { itens, addItem, updateItem, deleteItem } = useApp();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     nome: '',
     categoria: '',
@@ -15,22 +17,31 @@ export function Insumos() {
 
   const unidadesMedida = ['kg', 'unidade', 'litro', 'caixa', 'pacote', 'lata', 'bandeja'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     
-    if (editingId) {
-      updateItem(editingId, formData);
-      setEditingId(null);
-    } else {
-      const newItem: Insumo = {
-        id: Date.now().toString(),
-        ...formData,
-      };
-      addItem(newItem);
+    try {
+      if (editingId) {
+        await updateItem(editingId, formData);
+        setEditingId(null);
+      } else {
+        const newItem: Insumo = {
+          id: '', // O Firestore gerará o ID automaticamente
+          ...formData,
+        };
+        await addItem(newItem);
+      }
+      
+      setFormData({ nome: '', categoria: '', unidadeMedida: 'kg' });
+      setShowForm(false);
+    } catch (err) {
+      setError('Erro ao salvar item. Tente novamente.');
+      console.error('Erro ao salvar item:', err);
+    } finally {
+      setLoading(false);
     }
-    
-    setFormData({ nome: '', categoria: '', unidadeMedida: 'kg' });
-    setShowForm(false);
   };
 
   const handleEdit = (item: Insumo) => {
@@ -47,6 +58,20 @@ export function Insumos() {
     setFormData({ nome: '', categoria: '', unidadeMedida: 'kg' });
     setEditingId(null);
     setShowForm(false);
+    setError('');
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir este item?')) {
+      return;
+    }
+    
+    try {
+      await deleteItem(id);
+    } catch (err) {
+      alert('Erro ao excluir item. Tente novamente.');
+      console.error('Erro ao excluir item:', err);
+    }
   };
 
   return (
@@ -63,6 +88,7 @@ export function Insumos() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{editingId ? 'Editar Item' : 'Novo Item'}</h2>
             <form onSubmit={handleSubmit}>
+              {error && <div className="error-message">{error}</div>}
               <div className="form-group">
                 <label>Nome do Item:</label>
                 <input
@@ -70,6 +96,7 @@ export function Insumos() {
                   value={formData.nome}
                   onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                   required
+                  disabled={loading}
                 />
               </div>
               <div className="form-group">
@@ -79,6 +106,7 @@ export function Insumos() {
                   value={formData.categoria}
                   onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
                   required
+                  disabled={loading}
                 />
               </div>
               <div className="form-group">
@@ -87,6 +115,7 @@ export function Insumos() {
                   value={formData.unidadeMedida}
                   onChange={(e) => setFormData({ ...formData, unidadeMedida: e.target.value })}
                   required
+                  disabled={loading}
                 >
                   {unidadesMedida.map(uni => (
                     <option key={uni} value={uni}>{uni}</option>
@@ -94,11 +123,11 @@ export function Insumos() {
                 </select>
               </div>
               <div className="form-actions">
-                <button type="submit" className="btn-primary">
-                  {editingId ? 'Salvar' : 'Cadastrar'}
-                </button>
-                <button type="button" onClick={handleCancel} className="btn-secondary">
+                <button type="button" onClick={handleCancel} className="btn-secondary" disabled={loading}>
                   Cancelar
+                </button>
+                <button type="submit" className="btn-primary" disabled={loading}>
+                  {loading ? 'Salvando...' : (editingId ? 'Salvar' : 'Cadastrar')}
                 </button>
               </div>
             </form>
@@ -133,7 +162,7 @@ export function Insumos() {
                     <button onClick={() => handleEdit(item)} className="btn-edit">
                       Editar
                     </button>
-                    <button onClick={() => deleteItem(item.id)} className="btn-delete">
+                    <button onClick={() => handleDelete(item.id)} className="btn-delete">
                       Excluir
                     </button>
                   </td>

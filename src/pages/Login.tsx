@@ -1,29 +1,56 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase';
 import './Login.css';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');
+    setCarregando(true);
 
     // Validação simples
     if (!email || !senha) {
       setErro('Por favor, preencha todos os campos');
+      setCarregando(false);
       return;
     }
 
-    // Simulação de login (você pode integrar com sua API depois)
-    // Por enquanto, apenas salva no localStorage e redireciona
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userEmail', email);
-    
-    navigate('/dashboard');
+    try {
+      // Autenticação com Firebase
+      await signInWithEmailAndPassword(auth, email, senha);
+      
+      // Redireciona após login bem-sucedido
+      navigate('/estoque');
+    } catch (error: any) {
+      console.error('Erro no login:', error);
+      
+      // Tratamento de erros do Firebase
+      let mensagemErro = 'Erro ao fazer login. Tente novamente.';
+      
+      if (error.code === 'auth/invalid-email') {
+        mensagemErro = 'Email inválido.';
+      } else if (error.code === 'auth/user-not-found') {
+        mensagemErro = 'Usuário não encontrado.';
+      } else if (error.code === 'auth/wrong-password') {
+        mensagemErro = 'Senha incorreta.';
+      } else if (error.code === 'auth/invalid-credential') {
+        mensagemErro = 'Credenciais inválidas.';
+      } else if (error.code === 'auth/too-many-requests') {
+        mensagemErro = 'Muitas tentativas. Tente novamente mais tarde.';
+      }
+      
+      setErro(mensagemErro);
+    } finally {
+      setCarregando(false);
+    }
   };
 
   return (
@@ -60,8 +87,8 @@ export function Login() {
             />
           </div>
           
-          <button type="submit" className="btn-login">
-            Entrar
+          <button type="submit" className="btn-login" disabled={carregando}>
+            {carregando ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
       </div>

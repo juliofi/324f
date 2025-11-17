@@ -1,0 +1,49 @@
+PASSO A PASSO - CONFIGURAÇÃO DO FIRESTORE NO CONSOLE DO FIREBASE
+
+1. Acesse o Firebase Console
+   - Acesse https://console.firebase.google.com/
+   - Faça login com sua conta Gmail do projeto
+   - Selecione o projeto "controle-cd4f0" (ou o nome do seu projeto)
+
+2. Habilitar Firestore Database
+   - No menu lateral esquerdo, clique em "Firestore Database"
+   - Se for a primeira vez, clique no botão "Criar banco de dados"
+   - Escolha o modo de produção (Production mode)
+   - Selecione a localização do banco (escolha a mais próxima, ex: southamerica-east1 para Brasil)
+   - Clique em "Habilitar"
+
+3. Configurar Regras de Segurança
+   - Após criar o banco, vá para a aba "Regras" (Rules)
+   - Substitua as regras padrão pelas seguintes regras (ajuste conforme necessário):
+   
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       // Regras para a coleção 'itens'
+       match /itens/{itemId} {
+         // Permite leitura e escrita apenas para usuários autenticados
+         allow read, write: if request.auth != null;
+       }
+     }
+   }
+   
+   - Clique em "Publicar" para salvar as regras
+
+4. Criar a Coleção 'itens'
+   - Na aba "Dados" (Data), clique em "Iniciar coleção"
+   - Nome da coleção: "itens"
+   - ID do documento: deixe em branco para gerar automaticamente
+   - Adicione os campos:
+     * nome (string): "Item Teste"
+     * categoria (string): "Categoria Teste"
+     * unidadeMedida (string): "kg"
+   - Clique em "Salvar"
+   - Você pode deletar este documento de teste depois
+
+5. Verificar Configuração
+   - Certifique-se de que a coleção "itens" foi criada
+   - Verifique que as regras de segurança estão ativas
+   - Confirme que o Authentication está habilitado (necessário para as regras funcionarem)
+
+PRONTO! O Firestore está configurado e pronto para receber dados da aplicação.
+

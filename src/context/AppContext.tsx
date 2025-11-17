@@ -1,7 +1,8 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { Insumo, Fornecedor, Semana, Mercadoria } from '../types';
 import { gerarSemanasIniciais } from '../utils/semanas';
+import { subscribeItens, addItem as addItemFirestore, updateItem as updateItemFirestore, deleteItem as deleteItemFirestore } from '../services/itensService';
 
 interface AppContextType {
   itens: Insumo[];
@@ -27,10 +28,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [itens, setItens] = useState<Insumo[]>(() => {
-    const saved = localStorage.getItem('insumos');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [itens, setItens] = useState<Insumo[]>([]);
 
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>(() => {
     const saved = localStorage.getItem('fornecedores');
@@ -55,11 +53,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Salvar no localStorage sempre que houver mudanças
-  const saveItens = (newItens: Insumo[]) => {
-    setItens(newItens);
-    localStorage.setItem('insumos', JSON.stringify(newItens));
-  };
+  // Sincronizar itens com Firestore em tempo real
+  useEffect(() => {
+    const unsubscribe = subscribeItens((newItens) => {
+      setItens(newItens);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const saveFornecedores = (newFornecedores: Fornecedor[]) => {
     setFornecedores(newFornecedores);
@@ -76,16 +77,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('mercadorias', JSON.stringify(newMercadorias));
   };
 
-  const addItem = (item: Insumo) => {
-    saveItens([...itens, item]);
+  const addItem = async (item: Insumo) => {
+    try {
+      const { id, ...itemData } = item;
+      await addItemFirestore(itemData);
+      // O listener em tempo real atualizará o estado automaticamente
+    } catch (error) {
+      console.error('Erro ao adicionar item:', error);
+      throw error;
+    }
   };
 
-  const updateItem = (id: string, updates: Partial<Insumo>) => {
-    saveItens(itens.map(i => i.id === id ? { ...i, ...updates } : i));
+  const updateItem = async (id: string, updates: Partial<Insumo>) => {
+    try {
+      const { id: _, ...updateData } = updates;
+      await updateItemFirestore(id, updateData);
+      // O listener em tempo real atualizará o estado automaticamente
+    } catch (error) {
+      console.error('Erro ao atualizar item:', error);
+      throw error;
+    }
   };
 
-  const deleteItem = (id: string) => {
-    saveItens(itens.filter(i => i.id !== id));
+  const deleteItem = async (id: string) => {
+    try {
+      await deleteItemFirestore(id);
+      // O listener em tempo real atualizará o estado automaticamente
+    } catch (error) {
+      console.error('Erro ao deletar item:', error);
+      throw error;
+    }
   };
 
   const addFornecedor = (fornecedor: Fornecedor) => {
